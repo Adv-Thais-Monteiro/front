@@ -1,6 +1,20 @@
+import HeroSection from "@/components/HeroSection";
+import StatementSection from "@/components/StatementSection";
+import PracticeAreasSection from "@/components/PracticeAreasSection";
+import QualificationsSection from "@/components/QualificationsSection";
+import AboutSection from "@/components/AboutSection";
+import ContactSection from "@/components/ContactSection";
+
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background" />
+    <main className="bg-background">
+      <HeroSection />
+      <StatementSection />
+      <PracticeAreasSection />
+      <QualificationsSection />
+      <AboutSection />
+      <ContactSection />
+    </main>
   );
 };
 
