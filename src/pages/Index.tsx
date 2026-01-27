@@ -1,3 +1,5 @@
+import HeroSection from "@/components/HeroSection";
+
 const Index = () => {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -8,6 +10,8 @@ const Index = () => {
         {/* Right panel */}
         <div className="absolute top-0 right-0 w-1/2 h-full bg-card origin-right animate-page-open-right" />
       </div>
+      
+      <HeroSection />
     </div>
   );
 };
