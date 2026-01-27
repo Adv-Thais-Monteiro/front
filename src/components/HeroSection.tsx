@@ -1,11 +1,20 @@
 import { Button } from "@/components/ui/button";
+import { Scale } from "lucide-react";
 import thaisHero from "@/assets/thais-hero.jpg";
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex items-center texture-overlay">
+    <section className="relative min-h-screen flex items-center texture-overlay overflow-hidden">
       {/* Subtle radial gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-burgundy-900 via-burgundy-800 to-burgundy-900" />
+      
+      {/* Justice Scale Watermark/Decal */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <Scale 
+          className="w-[600px] h-[600px] md:w-[800px] md:h-[800px] lg:w-[1000px] lg:h-[1000px] text-primary/[0.03] rotate-12" 
+          strokeWidth={0.5}
+        />
+      </div>
       
       {/* Gold accent line at top */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
