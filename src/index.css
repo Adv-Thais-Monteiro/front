@@ -6,29 +6,29 @@
 
 @layer base {
   :root {
-    /* Deep Carbon Blacks */
-    --background: 0 0% 4%;
+    /* Deep Burgundy Base - #691218 = hsl(355, 70%, 25%) */
+    --background: 355 70% 8%;
     --foreground: 40 20% 95%;
 
-    /* Card surfaces - slightly lighter than background */
-    --card: 0 0% 7%;
+    /* Card surfaces - slightly lighter burgundy */
+    --card: 355 65% 12%;
     --card-foreground: 40 20% 95%;
 
     /* Popover */
-    --popover: 0 0% 6%;
+    --popover: 355 68% 10%;
     --popover-foreground: 40 20% 95%;
 
     /* Gold Accent - Muted Brushed Brass */
     --primary: 43 56% 52%;
-    --primary-foreground: 0 0% 4%;
+    --primary-foreground: 355 70% 8%;
 
-    /* Secondary - Charcoal */
-    --secondary: 0 0% 12%;
+    /* Secondary - Deep Burgundy */
+    --secondary: 355 60% 15%;
     --secondary-foreground: 40 20% 90%;
 
-    /* Muted tones */
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 60%;
+    /* Muted tones - Burgundy muted */
+    --muted: 355 50% 18%;
+    --muted-foreground: 40 15% 65%;
 
     /* Accent - Deep Gold */
     --accent: 43 45% 40%;
@@ -37,8 +37,8 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 43 20% 20%;
-    --input: 0 0% 15%;
+    --border: 43 25% 22%;
+    --input: 355 50% 18%;
     --ring: 43 56% 52%;
 
     --radius: 0.25rem;
@@ -47,28 +47,36 @@
     --gold-glow: 0 0 30px hsla(43, 56%, 52%, 0.15);
     --gold-border-glow: 0 0 15px hsla(43, 56%, 52%, 0.3);
     --text-shadow-gold: 0 0 40px hsla(43, 56%, 52%, 0.2);
+    
+    /* Burgundy custom properties */
+    --burgundy: 355 70% 25%;
+    --burgundy-light: 355 65% 35%;
+    --burgundy-dark: 355 75% 15%;
   }
 
   .dark {
-    --background: 0 0% 4%;
+    --background: 355 70% 8%;
     --foreground: 40 20% 95%;
-    --card: 0 0% 7%;
+    --card: 355 65% 12%;
     --card-foreground: 40 20% 95%;
-    --popover: 0 0% 6%;
+    --popover: 355 68% 10%;
     --popover-foreground: 40 20% 95%;
     --primary: 43 56% 52%;
-    --primary-foreground: 0 0% 4%;
-    --secondary: 0 0% 12%;
+    --primary-foreground: 355 70% 8%;
+    --secondary: 355 60% 15%;
     --secondary-foreground: 40 20% 90%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 60%;
+    --muted: 355 50% 18%;
+    --muted-foreground: 40 15% 65%;
     --accent: 43 45% 40%;
     --accent-foreground: 40 20% 95%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 43 20% 20%;
-    --input: 0 0% 15%;
+    --border: 43 25% 22%;
+    --input: 355 50% 18%;
     --ring: 43 56% 52%;
+    --burgundy: 355 70% 25%;
+    --burgundy-light: 355 65% 35%;
+    --burgundy-dark: 355 75% 15%;
   }
 }
 

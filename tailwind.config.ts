@@ -57,11 +57,13 @@ export default {
           dark: "hsl(43, 45%, 40%)",
           muted: "hsl(43, 30%, 35%)",
         },
-        carbon: {
-          900: "hsl(0, 0%, 4%)",
-          800: "hsl(0, 0%, 7%)",
-          700: "hsl(0, 0%, 12%)",
-          600: "hsl(0, 0%, 15%)",
+        burgundy: {
+          DEFAULT: "hsl(355, 70%, 25%)",
+          light: "hsl(355, 65%, 35%)",
+          dark: "hsl(355, 75%, 15%)",
+          900: "hsl(355, 70%, 8%)",
+          800: "hsl(355, 65%, 12%)",
+          700: "hsl(355, 60%, 18%)",
         },
       },
       borderRadius: {
@@ -100,8 +102,8 @@ export default {
       },
       backgroundImage: {
         "gold-gradient": "linear-gradient(135deg, hsl(43, 56%, 60%) 0%, hsl(43, 45%, 45%) 50%, hsl(43, 56%, 55%) 100%)",
-        "dark-gradient": "linear-gradient(180deg, hsl(0, 0%, 4%) 0%, hsl(0, 0%, 7%) 100%)",
-        "card-gradient": "linear-gradient(135deg, hsl(0, 0%, 8%) 0%, hsl(0, 0%, 6%) 100%)",
+        "burgundy-gradient": "linear-gradient(180deg, hsl(355, 70%, 8%) 0%, hsl(355, 65%, 12%) 100%)",
+        "card-gradient": "linear-gradient(135deg, hsl(355, 65%, 14%) 0%, hsl(355, 68%, 10%) 100%)",
       },
       boxShadow: {
         "gold-glow": "0 0 30px hsla(43, 56%, 52%, 0.15)",
