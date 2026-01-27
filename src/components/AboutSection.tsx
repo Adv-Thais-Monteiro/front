@@ -18,7 +18,7 @@ const AboutSection = () => {
                 className="w-full h-auto object-cover grayscale-[20%] contrast-[1.05]"
               />
               {/* Subtle overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-carbon-900/40 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-burgundy-900/40 via-transparent to-transparent" />
             </div>
           </div>
           

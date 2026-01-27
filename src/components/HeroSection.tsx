@@ -5,7 +5,7 @@ const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center texture-overlay">
       {/* Subtle radial gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-carbon-900 via-carbon-800 to-carbon-900" />
+      <div className="absolute inset-0 bg-gradient-to-br from-burgundy-900 via-burgundy-800 to-burgundy-900" />
       
       {/* Gold accent line at top */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -66,7 +66,7 @@ const HeroSection = () => {
                   className="w-full h-auto object-cover grayscale-[20%] contrast-[1.05]"
                 />
                 {/* Subtle overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-carbon-900/50 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-burgundy-900/50 via-transparent to-transparent" />
               </div>
             </div>
           </div>
