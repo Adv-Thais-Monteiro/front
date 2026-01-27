@@ -3,7 +3,7 @@ import { MessageCircle, Mail, MapPin, Shield } from "lucide-react";
 
 const ContactSection = () => {
   return (
-    <footer className="relative py-24 md:py-32 bg-carbon-900">
+    <footer className="relative py-24 md:py-32 bg-background">
       {/* Top gold line */}
       <div className="absolute top-0 left-0 right-0 gold-line" />
       

@@ -1,4 +1,11 @@
 import HeroSection from "@/components/HeroSection";
+import StatementSection from "@/components/StatementSection";
+import PracticeAreasSection from "@/components/PracticeAreasSection";
+import SuccessCasesSection from "@/components/SuccessCasesSection";
+import QualificationsSection from "@/components/QualificationsSection";
+import AboutSection from "@/components/AboutSection";
+import FAQSection from "@/components/FAQSection";
+import ContactSection from "@/components/ContactSection";
 
 const Index = () => {
   return (
@@ -12,6 +19,13 @@ const Index = () => {
       </div>
       
       <HeroSection />
+      <StatementSection />
+      <PracticeAreasSection />
+      <SuccessCasesSection />
+      <QualificationsSection />
+      <AboutSection />
+      <FAQSection />
+      <ContactSection />
     </div>
   );
 };
