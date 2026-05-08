@@ -5,8 +5,7 @@ import { MASSAGISTAS } from "./massagistasData";
 import "./projetos.css";
 
 const HERO_PLAYLIST = [
-  { id: 1140992315, hash: "4a0ae71ab8" },
-  { id: 721808009, hash: null as string | null },
+  { id: 1059482034, hash: "0bdd8253a0" as string | null },
 ];
 
 const CITIES = [
@@ -44,19 +43,18 @@ interface VimeoPlayer {
 }
 
 // Hero h1: 3 partes plana | <em> | plana, com <br/> entre 2 e 3
-const H1_PRE = "O ritual ";
-const H1_EM = "sensual";
-const H1_POST = " encontra você.";
+const H1_PRE = "Profissionais de ";
+const H1_EM = "bem-estar";
+const H1_POST = "perto de você.";
 const H1_TOTAL = H1_PRE.length + H1_EM.length + H1_POST.length;
 const H1_BR_AT = H1_PRE.length + H1_EM.length;
 
-// Aceite do age gate: in-memory only — não persistido em storage.
-// Cada reload (F5) reseta. Navegação entre rotas SPA mantém.
-let sessionAgeAccepted = false;
+// Loading screen: mostra na 1ª entrada (page load) pra dar tempo do vídeo
+// do hero carregar. Navegação SPA subsequente pula o loading.
+let firstVisitLoading = true;
 
 const Projetos = () => {
-  const [showAgeGate, setShowAgeGate] = useState(!sessionAgeAccepted);
-  const [showLoading, setShowLoading] = useState(false);
+  const [showLoading, setShowLoading] = useState(firstVisitLoading);
   const [showCidades, setShowCidades] = useState(false);
   const [citySearch, setCitySearch] = useState("");
   const [h1Typed, setH1Typed] = useState(0);
@@ -79,15 +77,23 @@ const Projetos = () => {
     document.body.style.overflow = "auto";
   };
 
-  // Age Gate: bloqueia scroll do body enquanto o gate estiver aberto
+  // Loading screen: trava scroll, libera após 2s na 1ª entrada
   useEffect(() => {
-    if (!sessionAgeAccepted) {
-      document.body.style.overflow = "hidden";
-    }
+    if (!firstVisitLoading) return;
+    document.body.style.overflow = "hidden";
+    const timer = setTimeout(() => {
+      firstVisitLoading = false;
+      setShowLoading(false);
+      document.body.style.overflow = "auto";
+    }, 2000);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Hero h1 typewriter (state-driven, letra por letra)
+  // Hero h1 typewriter — só começa depois do loading sumir
   useEffect(() => {
+    if (showLoading) return;
+    setH1Typed(0);
+    setH1Done(false);
     let pos = 0;
     const interval = setInterval(() => {
       pos += 1;
@@ -98,21 +104,7 @@ const Projetos = () => {
       }
     }, 90);
     return () => clearInterval(interval);
-  }, []);
-
-  const acceptAge = () => {
-    sessionAgeAccepted = true;
-    setShowAgeGate(false);
-    setShowLoading(true);
-    // mantém overflow:hidden durante o loading; libera ao final
-    setTimeout(() => {
-      setShowLoading(false);
-      document.body.style.overflow = "auto";
-    }, 2000);
-  };
-  const rejectAge = () => {
-    window.location.href = "https://www.google.com";
-  };
+  }, [showLoading]);
 
   // ESC fecha modal cidades
   useEffect(() => {
@@ -372,21 +364,14 @@ const Projetos = () => {
     <div className="projetos-page">
       <LogoSymbol />
 
-      {/* LOADING SCREEN — pós aceitação do age gate, dá tempo do vídeo carregar */}
+      {/* LOADING SCREEN — primeira entrada, dá tempo do vídeo do hero carregar */}
       {showLoading && (
         <div
           className="fixed inset-0 flex flex-col items-center justify-center gap-6"
-          style={{
-            zIndex: 10000,
-            background: "var(--bg)",
-          }}
+          style={{ zIndex: 10000, background: "var(--bg)" }}
         >
           <div className="h-32 animate-pulse">
-            <svg
-              className="logo-mark"
-              aria-hidden="true"
-              focusable="false"
-            >
+            <svg className="logo-mark" aria-hidden="true" focusable="false">
               <use href="#logo-ts" />
             </svg>
           </div>
@@ -414,35 +399,6 @@ const Projetos = () => {
           </div>
         </div>
       )}
-
-      {/* AGE GATE */}
-      <div id="ageGate" className={showAgeGate ? "open" : ""}>
-        <div className="max-w-md w-full bg-white border border-[var(--border-strong)] p-8 corner-card relative shadow-2xl">
-          <span className="corner-bl"></span>
-          <span className="corner-br"></span>
-          <div className="text-[10px] font-mono text-[var(--primary)] tracking-widest uppercase font-bold mb-4">
-            [ Conteúdo Adulto ]
-          </div>
-          <h2 className="font-display text-3xl tracking-tight text-[var(--text)] mb-3">
-            Você tem 18 anos ou mais?
-          </h2>
-          <p className="text-[var(--text-muted)] text-sm leading-relaxed mb-8">
-            Este site apresenta conteúdo destinado exclusivamente para maiores
-            de 18 anos.
-          </p>
-          <div className="flex gap-3">
-            <button onClick={acceptAge} className="flex-1 shiny-cta">
-              <span>Sim, sou maior de 18</span>
-            </button>
-            <button
-              onClick={rejectAge}
-              className="px-5 border border-[var(--border-strong)] bg-white text-[var(--text-muted)] text-xs font-medium uppercase tracking-wide hover:text-[var(--primary)] hover:border-[var(--primary)] transition"
-            >
-              Sair
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* NAVIGATION */}
       <nav
@@ -476,14 +432,11 @@ const Projetos = () => {
             <a className="nav-link" href="#hero">
               Início
             </a>
-            <a className="nav-link" href="#reels">
-              Vídeos
+            <a className="nav-link" href="#servicos">
+              Tipos de serviço
             </a>
             <a className="nav-link" href="#massagistas">
-              Massagistas
-            </a>
-            <a className="nav-link" href="#galeria">
-              Galeria
+              Terapeutas
             </a>
             <a className="nav-link" href="#sobre">
               Sobre
@@ -500,8 +453,8 @@ const Projetos = () => {
             >
               <i className="fa fa-search text-[10px]"></i> Buscar cidade
             </button>
-            <a href="#reels" className="nav-action nav-action-primary">
-              <i className="fas fa-circle-play text-[10px]"></i> Vídeos
+            <a href="#servicos" className="nav-action nav-action-primary">
+              <i className="fa fa-spa text-[10px]"></i> Serviços
             </a>
             <Link to="/login" className="nav-action-text">
               <i className="fa fa-user text-[10px] mr-1"></i> Login
@@ -523,7 +476,7 @@ const Projetos = () => {
               HERO_PLAYLIST[heroStartIdx].hash
                 ? `h=${HERO_PLAYLIST[heroStartIdx].hash}&`
                 : ""
-            }autoplay=1&muted=1&loop=0&controls=0&title=0&byline=0&portrait=0&autopause=0&dnt=1&playsinline=1&keyboard=0&pip=0&badge=0`}
+            }autoplay=1&muted=1&loop=1&controls=0&title=0&byline=0&portrait=0&autopause=0&dnt=1&playsinline=1&keyboard=0&pip=0&badge=0`}
             title="Toque Sútil Massagens"
             frameBorder={0}
             allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
@@ -552,7 +505,7 @@ const Projetos = () => {
                 ref={badgeRef}
                 className="tw-target tw-badge text-[11px] font-mono uppercase tracking-widest text-[var(--primary)]"
               >
-                Boutique de Massagem · Verificadas
+                Saúde e Bem Estar
               </span>
             </div>
 
@@ -582,13 +535,11 @@ const Projetos = () => {
               ref={pRef}
               className="tw-target tw-p hero-lede text-lg md:text-xl leading-relaxed max-w-xl mb-3"
             >
-              Massoterapeutas de <strong>tântrica</strong>,{" "}
-              <strong>nuru</strong> e <strong>erótica</strong> em mais de 50
-              cidades — fotos reais, contato direto, agendamento sem
-              intermediários.
+              Encontre <strong>terapeutas</strong> e{" "}
+              <strong>clínicas de massagem</strong> perto de você.
             </p>
             <div className="anim-fadeSlideIn-delay-11 font-mono text-[11px] uppercase tracking-[0.3em] text-[var(--primary)] mb-10">
-              [ Tântrica · Nuru · 4 Mãos · Sensitive ]
+              [ Terapêuticas · Relaxantes · Estéticas · Sensuais ]
             </div>
 
             <div className="anim-fadeSlideIn-delay-12 mb-8">
@@ -598,7 +549,7 @@ const Projetos = () => {
               >
                 <span className="flex items-center gap-3 text-[var(--text-muted)] group-hover:text-[var(--text)] transition">
                   <i className="fa fa-search text-[var(--primary)]"></i>
-                  <span>Buscar massagistas por cidade...</span>
+                  <span>Buscar terapeutas por cidade...</span>
                 </span>
                 <span className="hidden sm:inline-flex items-center justify-center w-11 h-11 rounded-full bg-[var(--primary)] text-white group-hover:bg-[var(--primary-dark)] transition">
                   <i className="fa fa-arrow-right text-sm"></i>
@@ -636,6 +587,117 @@ const Projetos = () => {
         </div>
       </section>
 
+      {/* CATEGORIAS / TIPOS DE SERVIÇO */}
+      <section
+        id="servicos"
+        className="anchor-offset max-w-7xl mx-auto px-6 py-20 border-t border-[var(--border)]"
+      >
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-4 animate-on-scroll anim-fadeSlideIn">
+          <div>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--primary)] font-bold">
+              [ 01. Categorias ]
+            </span>
+            <h2 className="font-display text-4xl md:text-6xl tracking-tight text-[var(--text)] mt-2">
+              Tipos de serviço
+            </h2>
+            <p className="text-[var(--text-muted)] mt-3 max-w-xl">
+              Profissionais especializados em diversas modalidades para cuidar do seu corpo, mente e bem-estar.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[
+            {
+              label: "Massagens Terapêuticas",
+              desc: "Alívio de dores e recuperação muscular",
+              icon: "fa-circle-nodes",
+              gradient: "linear-gradient(135deg, #c4b5e3 0%, #8e7ab8 100%)",
+              image: "/massagem-mulher.jpg",
+              delay: "delay-1",
+            },
+            {
+              label: "Massagens Relaxantes",
+              desc: "Equilíbrio e desconexão profunda",
+              icon: "fa-spa",
+              gradient: "linear-gradient(135deg, #b8ddd0 0%, #6ea795 100%)",
+              image: "/massagem-mulher-2.jpg",
+              delay: "delay-3",
+            },
+            {
+              label: "Massagens Estéticas",
+              desc: "Cuidados faciais e corporais",
+              icon: "fa-face-smile-beam",
+              gradient: "linear-gradient(135deg, #f5cccb 0%, #d4878a 100%)",
+              image: "/massagem-mulher-3.jpg",
+              delay: "delay-4",
+            },
+            {
+              label: "Outras Especialidades",
+              desc: "Drenagem, ventosa, pedras quentes e mais",
+              icon: "fa-lemon",
+              gradient: "linear-gradient(135deg, #c5d3e3 0%, #7d8fa6 100%)",
+              image: "/massagem-mulher-4.jpg",
+              delay: "delay-5",
+            },
+            {
+              label: "Massagens Sensuais",
+              desc: "Tântrica, nuru e modalidades íntimas",
+              icon: "fa-venus-mars",
+              gradient: "linear-gradient(135deg, #e8c5cf 0%, #9d2d4a 100%)",
+              image: "/massagem-mulher-1.jpg",
+              delay: "delay-2",
+            },
+            {
+              label: "Cursos",
+              desc: "Capacitação para profissionais da área",
+              icon: "fa-laptop",
+              gradient: "linear-gradient(135deg, #f5dfb8 0%, #c9a274 100%)",
+              image: "/massagem-mulher-5.jpg",
+              delay: "delay-6",
+            },
+          ].map((s) => (
+            <div
+              key={s.label}
+              className={`group relative aspect-[16/10] overflow-hidden border border-[var(--border)] corner-card col-anim animate-on-scroll ${s.delay} cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_16px_40px_-12px_rgba(157,45,74,.25)]`}
+            >
+              <span className="corner-bl"></span>
+              <span className="corner-br"></span>
+              {/* Imagem de fundo */}
+              <img
+                src={s.image}
+                alt={s.label}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              {/* Tint colorido (multiply: tinge a foto com a cor da categoria) */}
+              <div
+                className="absolute inset-0 mix-blend-multiply opacity-70 group-hover:opacity-50 transition-opacity duration-500"
+                style={{ background: s.gradient }}
+              ></div>
+              {/* Vignette inferior pra contraste do texto */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+              <div className="absolute top-5 left-5 w-14 h-14 rounded-full bg-white/95 backdrop-blur flex items-center justify-center shadow-lg z-10">
+                <i className={`fa-solid ${s.icon} text-[var(--primary)] text-xl`}></i>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
+                <h3
+                  className="font-display text-2xl md:text-3xl text-white leading-tight tracking-tight mb-1"
+                  style={{ textShadow: "0 2px 12px rgba(0,0,0,.5)" }}
+                >
+                  {s.label}
+                </h3>
+                <p
+                  className="text-white/85 text-xs md:text-sm font-mono"
+                  style={{ textShadow: "0 1px 6px rgba(0,0,0,.5)" }}
+                >
+                  {s.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* STORIES */}
       <section className="anchor-offset max-w-7xl mx-auto px-6 py-10 border-t border-[var(--border)]">
         <div className="flex items-center justify-between mb-6 animate-on-scroll anim-fadeSlideIn">
@@ -644,7 +706,7 @@ const Projetos = () => {
               [ Online Agora ]
             </span>
             <span className="text-[var(--text-muted)] text-sm">
-              Toque em uma massoterapeuta para ver o status
+              Toque em uma terapeuta para ver o status
             </span>
           </div>
           <span className="font-mono text-[11px] text-[var(--text-faint)]">
@@ -658,7 +720,7 @@ const Projetos = () => {
             { name: "Anne", img: "assets/whatsapp-image-2026-05-07-at-1_c0e99e981931.webp", time: "2 h" },
             { name: "Danny", img: "assets/4291cec9-6e6d-4031-b150-1ccb94_1ddd2944badf.webp", time: "3 h" },
             { name: "Anny Cabral", img: "assets/whatsapp-image-2026-02-20-at-1_48d22c4db28f.webp", time: "3 h" },
-            { name: "Ray", img: "assets/ray-massoterapeuta_c745ad6158b1.webp", time: "14 h" },
+            { name: "Ray", img: "assets/ray-terapeuta_c745ad6158b1.webp", time: "14 h" },
             { name: "Deusa Maya", img: "assets/whatsapp-image-2026-04-28-at-1_460c980ee5ed.webp", time: "15 h" },
             { name: "Ágatha", img: "assets/agata-capa0405_b1f62b6526d3.webp", time: "18 h" },
             { name: "Suyane", img: "assets/img_1396_5134059c329a.webp", time: "21 h" },
@@ -682,68 +744,6 @@ const Projetos = () => {
         </div>
       </section>
 
-      {/* REELS */}
-      <section
-        id="reels"
-        className="anchor-offset max-w-7xl mx-auto px-6 py-20 border-t border-[var(--border)]"
-      >
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-4 animate-on-scroll anim-fadeSlideIn">
-          <div>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--primary)] font-bold">
-              [ 01. Reels ]
-            </span>
-            <h2 className="font-display text-4xl md:text-6xl tracking-tight text-[var(--text)] mt-2">
-              Vídeos em destaque
-            </h2>
-            <p className="text-[var(--text-muted)] mt-3 max-w-xl">
-              Apresentações curtas das massoterapeutas — clique no perfil para
-              ver o reel completo e contato direto.
-            </p>
-          </div>
-          <button type="button" className="ghost-cta">
-            Ver todos <i className="fa fa-arrow-right text-xs"></i>
-          </button>
-        </div>
-
-        <div className="scroll-x flex gap-4 pb-4">
-          {[
-            { vid: "20784267", h: "bafedaddf9", city: "Maceió - AL", name: "Sophia", v: "8.2k", l: "642", grad: "linear-gradient(135deg, #4a1f2a, #9d2d4a 60%, #c9a274)", d: "delay-1" },
-            { vid: "25546879", h: "10de44524b", city: "Aracaju - SE", name: "Deusa Maya", v: "14.7k", l: "1.1k", grad: "linear-gradient(160deg, #2a1418, #9d2d4a, #e8c5cf)", d: "delay-2" },
-            { vid: "20972562", h: "e6cf03be96", city: "Recife - PE", name: "Isla Ferreira", v: "6.3k", l: "487", grad: "linear-gradient(120deg, #c9a274, #9d2d4a 50%, #2a1418)", d: "delay-3" },
-            { vid: "29158045", h: "66046799a3", city: "Salvador - BA", name: "Danny", v: "22.1k", l: "1.8k", grad: "linear-gradient(200deg, #7a1f37, #c9a274, #4a1f2a)", d: "delay-4" },
-            { vid: "20784267", h: "bafedaddf9", city: "Maceió - AL", name: "Ágatha", v: "9.9k", l: "723", grad: "linear-gradient(140deg, #9d2d4a, #2a1418 70%)", d: "delay-5" },
-          ].map((r, idx) => (
-            <a
-              key={idx}
-              href="#"
-              data-vimeo-id={r.vid}
-              data-vimeo-h={r.h}
-              className={`shrink-0 w-[260px] reel-card col-anim animate-on-scroll ${r.d} corner-card !border-0`}
-            >
-              <span className="corner-bl"></span>
-              <span className="corner-br"></span>
-              <div className="reel-thumb" style={{ background: r.grad }}></div>
-              <div className="reel-overlay"></div>
-              <span className="media-badge">
-                <i className="fas fa-circle-play"></i> Reel
-              </span>
-              <div className="absolute bottom-0 left-0 right-0 p-4 text-white z-10">
-                <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--accent)] mb-1">
-                  {r.city}
-                </div>
-                <div className="font-display text-lg leading-tight">
-                  {r.name}
-                </div>
-                <div className="text-[10px] text-white/70 font-mono mt-1.5">
-                  <i className="far fa-eye"></i> {r.v} ·{" "}
-                  <i className="fas fa-heart"></i> {r.l}
-                </div>
-              </div>
-            </a>
-          ))}
-        </div>
-      </section>
-
       {/* MASSAGISTAS GALLERY */}
       <section
         id="massagistas"
@@ -752,10 +752,10 @@ const Projetos = () => {
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-4 animate-on-scroll anim-fadeSlideIn">
           <div>
             <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--primary)] font-bold">
-              [ 02. Massagistas ]
+              [ 02. Terapeutas ]
             </span>
             <h2 className="font-display text-4xl md:text-6xl tracking-tight text-[var(--text)] mt-2">
-              Massagistas em destaque
+              Terapeutas em destaque
             </h2>
             <p className="text-[var(--text-muted)] mt-3 max-w-xl">
               Perfis verificados com fotos reais. Toque para acessar contato
@@ -844,184 +844,7 @@ const Projetos = () => {
         </div>
       </section>
 
-      {/* GALERIA */}
-      <section
-        id="galeria"
-        className="anchor-offset max-w-7xl mx-auto px-6 py-20 border-t border-[var(--border)]"
-      >
-        <div className="grid lg:grid-cols-12 gap-10">
-          <div className="lg:col-span-4 lg:sticky lg:top-32 lg:self-start animate-on-scroll anim-fadeSlideIn">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--primary)] font-bold">
-              [ 03. Galeria Privada ]
-            </span>
-            <h2 className="font-display text-4xl md:text-5xl tracking-tight text-[var(--text)] mt-2 mb-6">
-              Conteúdo exclusivo
-            </h2>
-            <p className="text-[var(--text-muted)] leading-relaxed mb-6">
-              Fotos e vídeos exclusivos das massoterapeutas — passe o cursor
-              para revelar uma prévia. Conteúdo completo disponível mediante
-              login.
-            </p>
-            <div className="flex flex-col gap-3">
-              {[
-                "Fotos verificadas",
-                "Atualizadas semanalmente",
-                "Reels exclusivos no perfil",
-              ].map((t) => (
-                <div
-                  key={t}
-                  className="flex items-center gap-3 text-sm text-[var(--text-muted)]"
-                >
-                  <span className="w-8 h-8 rounded-full bg-[var(--primary-soft)] text-[var(--primary)] flex items-center justify-center text-xs">
-                    <i className="fas fa-check"></i>
-                  </span>
-                  {t}
-                </div>
-              ))}
-            </div>
-
-            <Link
-              to="/login"
-              className="inline-flex items-center justify-center gap-2 mt-8 px-7 py-4 rounded-full bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-semibold text-sm uppercase tracking-wider transition-all hover:-translate-y-0.5 shadow-[0_10px_30px_-8px_rgba(157,45,74,.45)] hover:shadow-[0_16px_40px_-8px_rgba(157,45,74,.6)]"
-            >
-              Acessar Galeria <i className="fa fa-arrow-right text-xs"></i>
-            </Link>
-          </div>
-
-          <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-3 gap-3">
-            <div className="gallery-tile col-anim animate-on-scroll delay-1 aspect-[3/4] row-span-2">
-              <div
-                className="gt-img"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #c9a274, #9d2d4a 60%, #2a1418)",
-                  filter: "blur(14px)",
-                }}
-              ></div>
-              <div className="gt-veil">
-                <div className="gt-lock">
-                  <i className="fas fa-lock"></i>
-                </div>
-              </div>
-              <div className="absolute bottom-3 left-3 right-3 z-10">
-                <span className="inline-block bg-white/90 backdrop-blur px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-[var(--primary)]">
-                  Sophia · MCZ
-                </span>
-              </div>
-            </div>
-            <div className="gallery-tile col-anim animate-on-scroll delay-2 aspect-square">
-              <div
-                className="gt-img"
-                style={{
-                  background: "linear-gradient(160deg, #4a1f2a, #c9a274)",
-                  filter: "blur(14px)",
-                }}
-              ></div>
-              <div className="gt-veil">
-                <div className="gt-lock">
-                  <i className="fas fa-lock"></i>
-                </div>
-              </div>
-              <div className="absolute bottom-3 left-3 right-3 z-10">
-                <span className="inline-block bg-white/90 backdrop-blur px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-[var(--primary)]">
-                  Anne · AJU
-                </span>
-              </div>
-            </div>
-            <div className="gallery-tile col-anim animate-on-scroll delay-3 aspect-square">
-              <div
-                className="gt-img"
-                style={{
-                  background:
-                    "linear-gradient(120deg, #9d2d4a, #2a1418, #c9a274)",
-                  filter: "blur(14px)",
-                }}
-              ></div>
-              <div className="gt-veil">
-                <div className="gt-lock">
-                  <i className="fas fa-play"></i>
-                </div>
-              </div>
-              <div className="absolute top-3 right-3 z-10">
-                <span className="media-badge">
-                  <i className="fas fa-video"></i> 0:24
-                </span>
-              </div>
-              <div className="absolute bottom-3 left-3 right-3 z-10">
-                <span className="inline-block bg-white/90 backdrop-blur px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-[var(--primary)]">
-                  Danny · SSA · Vídeo
-                </span>
-              </div>
-            </div>
-            <div className="gallery-tile col-anim animate-on-scroll delay-4 aspect-[4/3] col-span-2">
-              <div
-                className="gt-img"
-                style={{
-                  background:
-                    "linear-gradient(100deg, #2a1418, #9d2d4a 50%, #e8c5cf)",
-                  filter: "blur(14px)",
-                }}
-              ></div>
-              <div className="gt-veil">
-                <div className="gt-lock">
-                  <i className="fas fa-lock"></i>
-                </div>
-              </div>
-              <div className="absolute bottom-3 left-3 right-3 z-10">
-                <span className="inline-block bg-white/90 backdrop-blur px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-[var(--primary)]">
-                  Deusa Maya · AJU
-                </span>
-              </div>
-            </div>
-            <div className="gallery-tile col-anim animate-on-scroll delay-5 aspect-square">
-              <div
-                className="gt-img"
-                style={{
-                  background: "linear-gradient(140deg, #7a1f37, #c9a274)",
-                  filter: "blur(14px)",
-                }}
-              ></div>
-              <div className="gt-veil">
-                <div className="gt-lock">
-                  <i className="fas fa-play"></i>
-                </div>
-              </div>
-              <div className="absolute top-3 right-3 z-10">
-                <span className="media-badge">
-                  <i className="fas fa-video"></i> 0:38
-                </span>
-              </div>
-              <div className="absolute bottom-3 left-3 right-3 z-10">
-                <span className="inline-block bg-white/90 backdrop-blur px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-[var(--primary)]">
-                  Ágatha · MCZ · Vídeo
-                </span>
-              </div>
-            </div>
-            <div className="gallery-tile col-anim animate-on-scroll delay-6 aspect-square">
-              <div
-                className="gt-img"
-                style={{
-                  background:
-                    "linear-gradient(180deg, #4a1f2a, #9d2d4a, #c9a274)",
-                  filter: "blur(14px)",
-                }}
-              ></div>
-              <div className="gt-veil">
-                <div className="gt-lock">
-                  <i className="fas fa-lock"></i>
-                </div>
-              </div>
-              <div className="absolute bottom-3 left-3 right-3 z-10">
-                <span className="inline-block bg-white/90 backdrop-blur px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-[var(--primary)]">
-                  Isla · REC
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Massoterapeuta */}
+      {/* CTA terapeuta */}
       <section className="max-w-7xl mx-auto px-6 py-20 border-t border-[var(--border)]">
         <div className="bg-white border border-[var(--border-strong)] p-8 md:p-16 corner-card relative overflow-hidden animate-on-scroll anim-fadeSlideIn shadow-[0_20px_60px_-20px_rgba(157,45,74,.2)]">
           <span className="corner-bl"></span>
@@ -1045,19 +868,16 @@ const Projetos = () => {
           <div className="grid md:grid-cols-5 gap-12 items-center relative z-10">
             <div className="md:col-span-3">
               <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--primary)] font-bold">
-                [ 04. Para Massoterapeutas ]
+                [ 04. Para terapeutas ]
               </span>
               <h2 className="font-display text-4xl md:text-6xl tracking-tight text-[var(--text)] mt-2 mb-4">
-                Você é massoterapeuta?
+                Você é terapeuta?
               </h2>
               <p className="text-[var(--text-muted)] text-lg leading-relaxed mb-2">
                 Anuncie conosco e descubra como deixar sua agenda cheia.
               </p>
               <p className="text-[var(--primary)] font-mono text-xs uppercase tracking-widest mb-8">
                 CADASTRE-SE GRÁTIS<sup>*</sup>{" "}
-                <span className="text-[var(--text-faint)]">
-                  (*Exceto Maceió e Aracaju)
-                </span>
               </p>
 
               <div className="flex flex-wrap gap-3">
@@ -1077,8 +897,8 @@ const Projetos = () => {
                 <span className="corner-bl"></span>
                 <span className="corner-br"></span>
                 <img
-                  src="Screenshot_7.png"
-                  alt="Você é massoterapeuta?"
+                  src="/massagem-mulher.jpg"
+                  alt="Você é terapeuta?"
                   className="w-full h-full object-cover mix-blend-multiply"
                 />
                 <div className="absolute inset-0 bg-gradient-to-tr from-[var(--primary)]/20 via-transparent to-[var(--accent)]/20"></div>
@@ -1088,13 +908,13 @@ const Projetos = () => {
         </div>
       </section>
 
-      {/* BLOG + DEPOIMENTOS */}
-      <section
+      {/* BLOG + DEPOIMENTOS — seção inteira oculta temporariamente */}
+      {false && <section
         id="blog"
         className="anchor-offset max-w-7xl mx-auto px-6 py-20 border-t border-[var(--border)]"
       >
-        <div className="grid md:grid-cols-2 gap-12">
-          <div className="animate-on-scroll anim-fadeSlideIn">
+        <div className="grid md:grid-cols-1 gap-12">
+          {false && <div className="animate-on-scroll anim-fadeSlideIn">
             <div className="flex items-baseline justify-between mb-8 border-b border-[var(--border)] pb-4">
               <div>
                 <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--primary)] font-bold">
@@ -1156,7 +976,7 @@ const Projetos = () => {
                 </a>
               ))}
             </div>
-          </div>
+          </div>}
 
           <div className="animate-on-scroll anim-fadeSlideIn-delay-2">
             <div className="flex items-baseline justify-between mb-8 border-b border-[var(--border)] pb-4">
@@ -1184,18 +1004,18 @@ const Projetos = () => {
                   img: "assets/sem-titulo_c2e8c4f1b6bc.jpeg",
                 },
                 {
-                  name: "Agata Massoterapeuta",
+                  name: "Agata terapeuta",
                   city: "Recife - PE",
                   ago: "há 2d 22h",
                   msg: '"Existe a massagem vivência?"',
-                  img: "assets/tm---agata-massoterapeuta_a0bffc5fd6af.jpg",
+                  img: "assets/tm---agata-terapeuta_a0bffc5fd6af.jpg",
                 },
                 {
-                  name: "Sophie Massoterapeuta",
+                  name: "Sophie terapeuta",
                   city: "Maceió - AL",
                   ago: "há 3d 16h",
                   msg: '"Além da massagem, tem interação sexual?"',
-                  img: "assets/tm---sophie-massoterapeuta_3541bcab967c.jpg",
+                  img: "assets/tm---sophie-terapeuta_3541bcab967c.jpg",
                 },
               ].map((d, idx) => (
                 <div
@@ -1238,7 +1058,7 @@ const Projetos = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section>}
 
       {/* SOBRE */}
       <section
@@ -1246,7 +1066,7 @@ const Projetos = () => {
         className="anchor-offset max-w-7xl mx-auto px-6 py-20 border-t border-[var(--border)]"
       >
         <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--primary)] font-bold">
-          [ 07. Sobre ]
+          [ 03. Sobre ]
         </span>
         <h2 className="font-display text-4xl md:text-6xl tracking-tight text-[var(--text)] mt-2 mb-12">
           O que é o Toque Sútil Massagens?
@@ -1255,27 +1075,20 @@ const Projetos = () => {
         <div className="space-y-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-baseline border-b border-[var(--border)] pb-8 animate-on-scroll anim-fadeSlideIn">
             <div className="text-[var(--text-faint)] font-mono text-xs uppercase tracking-widest">
-              [ 7.1 ]
+              [ 3.1 ]
             </div>
             <div className="md:col-span-3">
               <h3 className="font-display text-2xl md:text-3xl tracking-tight text-[var(--text)] mb-4">
-                Boutique de massagem sensual
+                Portal de massagem
               </h3>
               <p className="text-[var(--text-muted)] text-base md:text-lg leading-relaxed">
                 Portal especializado em{" "}
+                <strong className="text-[var(--text)]">massagem</strong>,
+                reunindo{" "}
                 <strong className="text-[var(--text)]">
-                  massagem sensual
+                  terapeutas verificados
                 </strong>
-                , reunindo as melhores massoterapeutas verificadas em{" "}
-                <strong className="text-[var(--text)]">tântrica</strong>,{" "}
-                <strong className="text-[var(--text)]">nuru</strong>,{" "}
-                <strong className="text-[var(--text)]">erótica</strong> e{" "}
-                <strong className="text-[var(--text)]">com finalização</strong>{" "}
-                em mais de 50 cidades. Integrante do{" "}
-                <strong className="text-[var(--text)]">
-                  grupo Tops do Brasil
-                </strong>
-                , conecta clientes e profissionais de forma direta, segura e
+                . Conecta clientes e profissionais de forma direta, segura e
                 discreta.
               </p>
             </div>
@@ -1283,29 +1096,31 @@ const Projetos = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-baseline border-b border-[var(--border)] pb-8 animate-on-scroll anim-fadeSlideIn">
             <div className="text-[var(--text-faint)] font-mono text-xs uppercase tracking-widest">
-              [ 7.2 ]
+              [ 3.2 ]
             </div>
             <div className="md:col-span-3">
               <h3 className="font-display text-2xl md:text-3xl tracking-tight text-[var(--text)] mb-4">
                 Por que escolher?
               </h3>
               <p className="text-[var(--text-muted)] text-base md:text-lg leading-relaxed">
-                Especializado exclusivamente em massagem sensual. Todos os
-                perfis verificados com fotos reais. Contato direto pelo
-                WhatsApp da profissional. Presente em mais de 30 cidades — de{" "}
-                <strong className="text-[var(--text)]">Maceió</strong> e{" "}
-                <strong className="text-[var(--text)]">Aracaju</strong> a{" "}
-                <strong className="text-[var(--text)]">São Paulo</strong>,{" "}
-                <strong className="text-[var(--text)]">Recife</strong>,{" "}
-                <strong className="text-[var(--text)]">Salvador</strong> e{" "}
-                <strong className="text-[var(--text)]">João Pessoa</strong>.
+                Especializado exclusivamente em{" "}
+                <strong className="text-[var(--text)]">
+                  saúde e bem-estar
+                </strong>{" "}
+                físico e mental. Todos os{" "}
+                <strong className="text-[var(--text)]">
+                  terapeutas verificados
+                </strong>
+                . Contato direto pelo{" "}
+                <strong className="text-[var(--text)]">WhatsApp</strong> da
+                profissional.
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-baseline border-b border-[var(--border)] pb-8 animate-on-scroll anim-fadeSlideIn">
             <div className="text-[var(--text-faint)] font-mono text-xs uppercase tracking-widest">
-              [ 7.3 ]
+              [ 3.3 ]
             </div>
             <div className="md:col-span-3">
               <h3 className="font-display text-2xl md:text-3xl tracking-tight text-[var(--text)] mb-4">
@@ -1315,17 +1130,17 @@ const Projetos = () => {
                 Profissionais especializadas em todas as principais
                 modalidades.
               </p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {[
+                  "› Terapêuticas",
+                  "› Relaxante",
+                  "› Estética",
+                  "› Com Pedras",
                   "› Tântrica",
                   "› Nuru",
-                  "› Erótica",
-                  "› Relaxante Masculina",
-                  "› Com Finalização",
+                  "› Sensuais",
                   "› 4 Mãos",
                   "› Sensitive",
-                  "› Mútua",
-                  "› Tailandesa",
                 ].map((m) => (
                   <div
                     key={m}
@@ -1340,7 +1155,7 @@ const Projetos = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-baseline animate-on-scroll anim-fadeSlideIn">
             <div className="text-[var(--text-faint)] font-mono text-xs uppercase tracking-widest">
-              [ 7.4 ]
+              [ 3.4 ]
             </div>
             <div className="md:col-span-3">
               <h3 className="font-display text-2xl md:text-3xl tracking-tight text-[var(--text)] mb-4">
@@ -1371,7 +1186,7 @@ const Projetos = () => {
         <div className="grid md:grid-cols-3 gap-12">
           <div>
             <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--primary)] font-bold">
-              [ 08. FAQ ]
+              [ 04. FAQ ]
             </span>
             <h2 className="font-display text-4xl md:text-5xl tracking-tight text-[var(--text)] mt-2 mb-4">
               Perguntas frequentes
@@ -1383,7 +1198,7 @@ const Projetos = () => {
             <div className="mt-8 inline-flex bg-white border border-[var(--border-strong)] rounded-full px-3 py-1.5 gap-2 items-center">
               <span className="flex h-1.5 w-1.5 rounded-full bg-[var(--primary)] animate-pulse"></span>
               <span className="text-xs font-mono uppercase tracking-widest text-[var(--primary)]">
-                8 questões respondidas
+                10 questões respondidas
               </span>
             </div>
           </div>
@@ -1391,36 +1206,44 @@ const Projetos = () => {
           <div className="md:col-span-2 space-y-3 animate-on-scroll anim-fadeSlideIn">
             {[
               {
+                q: "O que é massagem terapêutica?",
+                a: "Voltada para o alívio de dores, tensões musculares e recuperação física. Indicada para quem sofre com problemas posturais, contraturas, lesões ou estresse acumulado. Combina técnicas como amassamento, fricção, alongamentos e pressão em pontos específicos.",
+              },
+              {
+                q: "O que é massagem relaxante?",
+                a: "Promove relaxamento profundo do corpo e da mente, reduzindo o estresse e a ansiedade, melhorando a circulação e a qualidade do sono. Movimentos suaves, ritmo lento e pressão leve a moderada — ideal pra desligar do dia a dia.",
+              },
+              {
+                q: "O que é massagem com pedras?",
+                a: "Utiliza pedras vulcânicas aquecidas posicionadas em pontos estratégicos do corpo. O calor relaxa a musculatura profundamente, melhora a circulação sanguínea e proporciona uma sensação de bem-estar imediato. Sessões geralmente duram 60 a 90 minutos.",
+              },
+              {
+                q: "O que é massagem estética?",
+                a: "Voltada para fins estéticos como redução de medidas, modelagem corporal, drenagem linfática, combate à celulite e flacidez. Pode incluir cremes, óleos específicos e equipamentos como roller, ventosas ou aparelhos de radiofrequência.",
+              },
+              {
+                q: "Como encontrar massagem na minha cidade?",
+                a: "Selecione sua cidade no campo de busca. A plataforma exibe todos os perfis disponíveis com fotos reais, modalidades, localização aproximada e contato direto via WhatsApp.",
+              },
+              {
+                q: "As fotos das terapeutas são reais?",
+                a: "Sim. Todos os perfis cadastrados passam por verificação de fotos e identidade. Em caso de dúvida, entre em contato pelo WhatsApp da profissional antes de se deslocar.",
+              },
+              {
+                q: "É possível receber massagem em hotel?",
+                a: "Sim. Diversas terapeutas oferecem atendimento a domicílio, incluindo hotéis e flats. Combine diretamente com a profissional informando hotel, cidade e número do quarto.",
+              },
+              {
+                q: "Como anunciar no Toque Sútil Massagens?",
+                a: "Cadastre-se em /cadastre-se. Suporte de segunda a sexta, das 9h às 12h e das 14h às 17h, pelo WhatsApp 34 9999-9999.",
+              },
+              {
                 q: "O que é massagem tântrica?",
                 a: "A massagem tântrica integra respiração consciente, energia corporal e estimulação sensorial progressiva. Trabalha a conexão entre corpo e mente, proporcionando relaxamento profundo. As sessões duram entre 60 e 90 minutos.",
               },
               {
                 q: "O que é massagem nuru?",
                 a: "Técnica japonesa que utiliza um gel especial à base de alga nori para proporcionar contato corporal deslizante e intenso. É realizada em colchão ou lona específica e é uma das modalidades mais procuradas no Toque Sútil Massagens.",
-              },
-              {
-                q: "O que é massagem com finalização?",
-                a: "Sessão que inclui estimulação íntima ao final do atendimento. O escopo é sempre definido diretamente com a massoterapeuta antes do agendamento. Verifique no perfil antes de entrar em contato.",
-              },
-              {
-                q: "Como encontrar massagem sensual na minha cidade?",
-                a: "Selecione sua cidade no campo de busca. A plataforma exibe todos os perfis disponíveis com fotos reais, modalidades, localização aproximada e contato direto via WhatsApp.",
-              },
-              {
-                q: "As fotos das massagistas são reais?",
-                a: "Sim. Todos os perfis cadastrados passam por verificação de fotos e identidade. Em caso de dúvida, entre em contato pelo WhatsApp da profissional antes de se deslocar.",
-              },
-              {
-                q: "É possível receber massagem sensual em hotel?",
-                a: "Sim. Diversas massoterapeutas oferecem atendimento a domicílio, incluindo hotéis e flats. Combine diretamente com a profissional informando hotel, cidade e número do quarto.",
-              },
-              {
-                q: "As massoterapeutas atendem casais?",
-                a: "Sim. Algumas profissionais oferecem atendimento a casais, incluindo massagem nuru voyeur e massagem mútua. Confirme a disponibilidade pelo WhatsApp antes de agendar.",
-              },
-              {
-                q: "Como anunciar no Toque Sútil Massagens?",
-                a: "Cadastre-se em /cadastre-se. Suporte de segunda a sexta, das 9h às 12h e das 14h às 17h, pelo WhatsApp 34 9999-9999.",
               },
             ].map((f, idx) => (
               <details key={idx} className="faq-item">
@@ -1467,7 +1290,7 @@ const Projetos = () => {
       {/* FOOTER */}
       <footer className="border-t border-[var(--border)] mt-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 py-16">
-          <div className="grid md:grid-cols-4 gap-10">
+          <div className="grid md:grid-cols-3 gap-10">
             <div className="md:col-span-1 space-y-6">
               <div className="flex flex-col items-start gap-3">
                 <div className="h-16">
@@ -1531,39 +1354,14 @@ const Projetos = () => {
 
             <div>
               <h3 className="font-mono text-[10px] uppercase tracking-widest text-[var(--primary)] font-bold mb-6">
-                [ Cidades mais buscadas ]
-              </h3>
-              <ul className="space-y-3">
-                {[
-                  { name: "Massagem em Maceió", url: "maceio-al" },
-                  { name: "Massagem em Aracaju", url: "aracaju-se" },
-                  { name: "Massagem em Recife", url: "recife-pe" },
-                  { name: "Massagem em Salvador", url: "salvador-ba" },
-                  { name: "Massagem em João Pessoa", url: "joao-pessoa-pb" },
-                ].map((c) => (
-                  <li key={c.url}>
-                    <Link
-                      to={`/massagem-sensual/${c.url}`}
-                      className="group flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition"
-                    >
-                      <span className="w-3 h-px bg-[var(--border-strong)] group-hover:w-6 group-hover:bg-[var(--primary)] transition-all"></span>
-                      {c.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-mono text-[10px] uppercase tracking-widest text-[var(--primary)] font-bold mb-6">
                 [ Massagens mais buscadas ]
               </h3>
               <ul className="space-y-3">
                 {[
-                  { name: "Massagem Tântrica", url: "massagem-tantrica" },
-                  { name: "Massagem Nuru", url: "massagem-nuru" },
-                  { name: "Massagem Relaxante", url: "massagem-relaxante" },
-                  { name: "Massagem Sensitive", url: "massagem-sensitive" },
+                  { name: "Terapêuticas", url: "massagem-terapeutica" },
+                  { name: "Relaxantes", url: "massagem-relaxante" },
+                  { name: "Estéticas", url: "massagem-estetica" },
+                  { name: "Sensuais", url: "massagem-sensual" },
                 ].map((m) => (
                   <li key={m.url}>
                     <Link
@@ -1606,41 +1404,6 @@ const Projetos = () => {
               </ul>
             </div>
           </div>
-
-          <div className="mt-16 pt-8 border-t border-[var(--border)]">
-            <h3 className="text-xs font-mono text-[var(--text-faint)] tracking-widest uppercase mb-4">
-              [ Sites parceiros ]
-            </h3>
-            <div className="flex flex-wrap gap-x-3 gap-y-2 text-xs text-[var(--text-muted)]">
-              <a
-                href="https://saltsbr.com.br/acompanhantes-curitiba/"
-                className="hover:text-[var(--primary)] transition"
-              >
-                Acompanhantes em Curitiba
-              </a>
-              <span className="text-[var(--border-strong)]">|</span>
-              <a
-                href="https://www.topsdemaceio.com.br/"
-                className="hover:text-[var(--primary)] transition"
-              >
-                Acompanhantes Maceió
-              </a>
-              <span className="text-[var(--border-strong)]">|</span>
-              <a
-                href="https://www.topsdobrasil.com.br/acompanhantes-recife-pe"
-                className="hover:text-[var(--primary)] transition"
-              >
-                Acompanhantes Recife
-              </a>
-              <span className="text-[var(--border-strong)]">|</span>
-              <a
-                href="https://www.scortrio.com"
-                className="hover:text-[var(--primary)] transition"
-              >
-                Acompanhantes RJ
-              </a>
-            </div>
-          </div>
         </div>
 
         <div className="border-t border-[var(--border)] bg-[var(--bg)]">
@@ -1653,11 +1416,11 @@ const Projetos = () => {
                 [ Siga nas redes ]
               </span>
               {[
-                { ic: "fab fa-instagram", href: "https://www.instagram.com/tops.massagens/", l: "Instagram" },
-                { ic: "fab fa-youtube", href: "https://www.youtube.com/@TopsMassagens", l: "Youtube" },
-                { ic: "fab fa-telegram", href: "http://t.me/topsmassagens", l: "Telegram" },
-                { ic: "fab fa-tiktok", href: "https://www.tiktok.com/@tops.massagens", l: "TikTok" },
-                { ic: "fab fa-twitter", href: "https://x.com/topsmassagens", l: "X" },
+                { ic: "fab fa-instagram", href: "", l: "Instagram" },
+                { ic: "fab fa-youtube", href: "", l: "Youtube" },
+                { ic: "fab fa-telegram", href: "", l: "Telegram" },
+                { ic: "fab fa-tiktok", href: "", l: "TikTok" },
+                { ic: "fab fa-twitter", href: "", l: "X" },
               ].map((s) => (
                 <a
                   key={s.l}
@@ -1680,11 +1443,11 @@ const Projetos = () => {
         <a href="#hero">
           <i className="fa fa-home"></i>Início
         </a>
-        <a href="#reels">
-          <i className="fas fa-circle-play"></i>Vídeos
+        <a href="#servicos">
+          <i className="fa fa-spa"></i>Serviços
         </a>
-        <a href="#blog">
-          <i className="fa fa-list"></i>Blog
+        <a href="#massagistas">
+          <i className="fa fa-user-doctor"></i>Terapeutas
         </a>
         <Link to="/login">
           <i className="fa fa-user"></i>Login

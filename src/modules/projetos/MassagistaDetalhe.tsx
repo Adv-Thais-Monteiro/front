@@ -80,7 +80,7 @@ const MassagistaDetalhe = () => {
               Vídeos
             </Link>
             <Link className="nav-link" to="/#massagistas">
-              Massagistas
+              Terapeutas
             </Link>
             <Link className="nav-link" to="/#galeria">
               Galeria
@@ -242,7 +242,7 @@ const MassagistaDetalhe = () => {
                 {m.noSexualInteraction && (
                   <div className="mt-4 flex items-start gap-2 px-3 py-2.5 bg-[var(--primary-soft)] border border-[var(--primary)]/30 text-[11px] text-[var(--primary-dark)]">
                     <i className="fa fa-circle-info mt-0.5"></i>
-                    <span>Não há interação sexual com a(o) Massagista</span>
+                    <span>Não há interação sexual com a(o) Terapeuta</span>
                   </div>
                 )}
 
