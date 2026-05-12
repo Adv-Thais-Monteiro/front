@@ -106,8 +106,10 @@
 @property --gradient-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
 .projetos-page .shiny-cta {
   position: relative; overflow: hidden; border-radius: 9999px;
+  display: inline-flex; align-items: center; justify-content: center;
   padding: 1.05rem 2.4rem; font-size: .95rem; line-height: 1.2;
   font-weight: 600; color: var(--surface); letter-spacing: .04em; text-transform: uppercase;
+  text-align: center;
   background: linear-gradient(var(--primary), var(--primary-dark)) padding-box,
               conic-gradient(from var(--gradient-angle), transparent 0%, var(--accent) 5%, #fff 15%, var(--accent) 30%, transparent 40%, transparent 100%) border-box;
   border: 2px solid transparent;
@@ -294,6 +296,85 @@
   display: none; align-items: center; justify-content: center; padding: 1rem;
 }
 .projetos-page #ageGate.open { display: flex; }
+
+/* ===================== MOBILE MENU OVERLAY ===================== */
+@keyframes proj-mm-slide-in {
+  from { transform: translateY(-30px); opacity: 0; filter: blur(8px); }
+  to   { transform: translateY(0); opacity: 1; filter: blur(0); }
+}
+.projetos-page .mobile-menu-overlay {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(253, 249, 244, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.projetos-page .mobile-menu-overlay > * {
+  animation: proj-mm-slide-in .45s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+.projetos-page .mobile-menu-link {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+  font-family: 'Playfair Display', serif;
+  font-size: 1.75rem; font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  transition: all .3s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.projetos-page .mobile-menu-link:hover,
+.projetos-page .mobile-menu-link:active {
+  color: var(--primary);
+  transform: translateX(.5rem);
+}
+.projetos-page .mobile-menu-link .mm-num {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px; font-weight: 700;
+  color: var(--primary);
+  letter-spacing: .15em;
+}
+
+/* Hamburger — bem contrastado pra ser visível tanto sobre o vídeo (transparente)
+   quanto no estado scrolled (creme). */
+.projetos-page .hamburger {
+  width: 44px; height: 44px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #fff;
+  background: rgba(42, 20, 24, 0.55); /* vinho escuro semi-transparente */
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all .25s;
+  border-radius: 0;
+  cursor: pointer;
+}
+.projetos-page .hamburger:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.projetos-page #mainNav.scrolled .hamburger {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--border-strong);
+}
+.projetos-page #mainNav.scrolled .hamburger:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+/* Dentro do overlay (fora do nav) o hamburger volta a ter cor padrão dark */
+.projetos-page .mobile-menu-overlay .hamburger {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--border-strong);
+  backdrop-filter: none;
+}
+.projetos-page .mobile-menu-overlay .hamburger:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+@media (min-width: 768px) {
+  .projetos-page .hamburger { display: none; }
+}
 
 /* ===================== FLOATING BOTTOM MENU ===================== */
 .projetos-page .menu-flutuante {

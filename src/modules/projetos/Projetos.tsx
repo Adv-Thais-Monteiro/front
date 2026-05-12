@@ -56,6 +56,7 @@ let firstVisitLoading = true;
 const Projetos = () => {
   const [showLoading, setShowLoading] = useState(firstVisitLoading);
   const [showCidades, setShowCidades] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [citySearch, setCitySearch] = useState("");
   const [h1Typed, setH1Typed] = useState(0);
   const [h1Done, setH1Done] = useState(false);
@@ -106,14 +107,27 @@ const Projetos = () => {
     return () => clearInterval(interval);
   }, [showLoading]);
 
-  // ESC fecha modal cidades
+  // ESC fecha modal cidades / menu mobile
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeCidades();
+      if (e.key === "Escape") {
+        closeCidades();
+        setShowMobileMenu(false);
+      }
     };
     document.addEventListener("keyup", onKey);
     return () => document.removeEventListener("keyup", onKey);
   }, []);
+
+  // Trava scroll do body enquanto menu mobile aberto
+  useEffect(() => {
+    if (showMobileMenu) {
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "auto";
+      };
+    }
+  }, [showMobileMenu]);
 
   // IntersectionObserver para animar elementos
   useEffect(() => {
@@ -406,7 +420,7 @@ const Projetos = () => {
         id="mainNav"
         className="fixed top-0 left-0 right-0 z-50 anim-fadeSlideIn-delay-3"
       >
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-6">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex items-center justify-between gap-4 md:gap-6">
           <div
             className="flex items-center gap-3 shrink-0 cursor-pointer"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
@@ -449,19 +463,129 @@ const Projetos = () => {
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={openCidades}
-              className="nav-action hidden md:inline-flex"
+              className="nav-action !hidden md:!inline-flex"
             >
               <i className="fa fa-search text-[10px]"></i> Buscar cidade
             </button>
-            <a href="#servicos" className="nav-action nav-action-primary">
+            <a
+              href="#servicos"
+              className="nav-action nav-action-primary !hidden md:!inline-flex"
+            >
               <i className="fa fa-spa text-[10px]"></i> Serviços
             </a>
-            <Link to="/login" className="nav-action-text">
+            <Link
+              to="/login"
+              className="nav-action-text !hidden md:!inline-flex"
+            >
               <i className="fa fa-user text-[10px] mr-1"></i> Login
             </Link>
+            {/* Hamburger — mobile only */}
+            <button
+              onClick={() => setShowMobileMenu((s) => !s)}
+              className="md:hidden hamburger"
+              aria-label={showMobileMenu ? "Fechar menu" : "Abrir menu"}
+              aria-expanded={showMobileMenu}
+            >
+              <i
+                className={`fa ${
+                  showMobileMenu ? "fa-times" : "fa-bars"
+                } text-base`}
+              ></i>
+            </button>
           </div>
         </div>
       </nav>
+
+      {/* MOBILE MENU OVERLAY */}
+      {showMobileMenu && (
+        <div
+          className="mobile-menu-overlay md:hidden"
+          onClick={() => setShowMobileMenu(false)}
+        >
+          <div
+            className="relative h-full flex flex-col px-6 pt-28 pb-12 max-w-md mx-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-8 border-b border-[var(--border)] pb-4">
+              <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-[var(--primary)] font-bold">
+                [ Menu ]
+              </span>
+              <button
+                onClick={() => setShowMobileMenu(false)}
+                className="hamburger"
+                aria-label="Fechar menu"
+              >
+                <i className="fa fa-times text-base"></i>
+              </button>
+            </div>
+
+            <nav className="flex-1 flex flex-col">
+              {[
+                { label: "Início", href: "#hero" },
+                { label: "Tipos de serviço", href: "#servicos" },
+                { label: "Terapeutas", href: "#massagistas" },
+                { label: "Sobre", href: "#sobre" },
+                { label: "FAQ", href: "#faq" },
+              ].map((item, i) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setShowMobileMenu(false)}
+                  className="mobile-menu-link"
+                >
+                  <span className="mm-num">0{i + 1}</span>
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+
+            <div className="mt-8 flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  setShowMobileMenu(false);
+                  openCidades();
+                }}
+                className="ghost-cta w-full"
+              >
+                <i className="fa fa-search"></i> Buscar Cidade
+              </button>
+              <Link
+                to="/login"
+                onClick={() => setShowMobileMenu(false)}
+                className="shiny-cta w-full"
+              >
+                <span>
+                  <i className="fa fa-user"></i> Login
+                </span>
+              </Link>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-[var(--border)] flex items-center justify-between">
+              <span className="font-mono text-[9px] uppercase tracking-widest text-[var(--text-faint)]">
+                Toque Sútil © 2026
+              </span>
+              <div className="flex gap-2">
+                <a
+                  href="https://www.instagram.com/tops.massagens/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-7 h-7 flex items-center justify-center border border-[var(--border-strong)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)] transition"
+                >
+                  <i className="fab fa-instagram text-xs"></i>
+                </a>
+                <a
+                  href="https://www.tiktok.com/@tops.massagens"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-7 h-7 flex items-center justify-center border border-[var(--border-strong)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)] transition"
+                >
+                  <i className="fab fa-tiktok text-xs"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* HERO */}
       <section
@@ -1437,22 +1561,6 @@ const Projetos = () => {
           </div>
         </div>
       </footer>
-
-      {/* Floating mobile menu */}
-      <div className="menu-flutuante">
-        <a href="#hero">
-          <i className="fa fa-home"></i>Início
-        </a>
-        <a href="#servicos">
-          <i className="fa fa-spa"></i>Serviços
-        </a>
-        <a href="#massagistas">
-          <i className="fa fa-user-doctor"></i>Terapeutas
-        </a>
-        <Link to="/login">
-          <i className="fa fa-user"></i>Login
-        </Link>
-      </div>
 
       {/* MODAL CIDADES */}
       <div
