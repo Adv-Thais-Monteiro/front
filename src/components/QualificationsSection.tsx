@@ -3,7 +3,7 @@ import { GraduationCap, Award, Users, BookOpen } from "lucide-react";
 const credentials = [
   {
     icon: GraduationCap,
-    title: "Pós-graduação em Direito Penal e Processual Penal",
+    title: "Pós-graduanda em Direito Penal e Processual Penal",
     institution: "Instituição de Referência Nacional"
   },
   {
@@ -13,8 +13,8 @@ const credentials = [
   },
   {
     icon: Users,
-    title: "Membro da Comissão de Direito Criminal",
-    institution: "Ordem dos Advogados do Brasil"
+    title: "Membro da Cúpula",
+    institution: "Mentoria e networking para o crescimento na advocacia"
   },
   {
     icon: BookOpen,

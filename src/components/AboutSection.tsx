@@ -1,4 +1,4 @@
-import thaisAbout from "@/assets/thais-about.jpg";
+import thaisAbout from "@/assets/thais-bordo-cadeira-frente.jpg";
 
 const AboutSection = () => {
   return (
@@ -6,7 +6,7 @@ const AboutSection = () => {
       <div className="container mx-auto px-6 lg:px-12">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center max-w-6xl mx-auto">
           {/* Image */}
-          <div className="relative">
+          <div className="relative w-full max-w-md mx-auto">
             {/* Gold frame accent */}
             <div className="absolute -inset-3 border border-primary/20" />
             <div className="absolute -inset-6 border border-primary/10" />
@@ -14,8 +14,9 @@ const AboutSection = () => {
             <div className="relative overflow-hidden">
               <img 
                 src={thaisAbout} 
-                alt="Dra. Thais Monteiro"
-                className="w-full h-auto object-cover grayscale-[20%] contrast-[1.05]"
+                alt="Dra. Thais Monteiro apoiada no encosto de uma cadeira"
+                className="w-full aspect-[4/5] object-cover object-top grayscale-[10%] contrast-[1.05]"
+                loading="lazy"
               />
               {/* Subtle overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-burgundy-900/40 via-transparent to-transparent" />

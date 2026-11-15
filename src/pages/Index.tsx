@@ -1,10 +1,10 @@
 import HeroSection from "@/components/HeroSection";
 import StatementSection from "@/components/StatementSection";
 import PracticeAreasSection from "@/components/PracticeAreasSection";
-import SuccessCasesSection from "@/components/SuccessCasesSection";
+import ProcessSection from "@/components/ProcessSection";
 import QualificationsSection from "@/components/QualificationsSection";
 import AboutSection from "@/components/AboutSection";
-import BlogSection from "@/components/BlogSection";
+import GallerySection from "@/components/GallerySection";
 import FAQSection from "@/components/FAQSection";
 import ContactSection from "@/components/ContactSection";
 
@@ -22,10 +22,12 @@ const Index = () => {
       <HeroSection />
       <StatementSection />
       <PracticeAreasSection />
-      <SuccessCasesSection />
+      <ProcessSection />
       <QualificationsSection />
       <AboutSection />
-      <BlogSection />
+      <GallerySection />
+      {/* Blog oculto até haver artigos publicados. Para reativar:
+          importe BlogSection de "@/components/BlogSection" e renderize aqui. */}
       <FAQSection />
       <ContactSection />
     </div>
